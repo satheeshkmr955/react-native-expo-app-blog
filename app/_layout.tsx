@@ -5,9 +5,11 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import Animated from "react-native-reanimated";
+import { PlusIcon, PencilIcon } from "lucide-react-native";
 
 import "../global.css";
 
@@ -58,7 +60,47 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen
           name="(home)"
-          options={{ title: "Home", headerTitleAlign: "center" }}
+          options={{
+            title: "Blog List",
+            headerTitleAlign: "center",
+            headerRight: () => {
+              return (
+                <Link href="/create">
+                  <Animated.View className="p-4 cursor-pointer">
+                    <PlusIcon
+                      size={27}
+                      color={"black"}
+                      className="w-[27] h-[27]"
+                    />
+                  </Animated.View>
+                </Link>
+              );
+            },
+          }}
+        />
+        <Stack.Screen
+          name="show"
+          options={{
+            title: "Blog Details",
+            headerTitleAlign: "center",
+            headerRight: () => {
+              return (
+                <Link href="/edit">
+                  <Animated.View className="p-4 cursor-pointer">
+                    <PencilIcon
+                      size={25}
+                      color={"black"}
+                      className="w-[25] h-[25]"
+                    />
+                  </Animated.View>
+                </Link>
+              );
+            },
+          }}
+        />
+        <Stack.Screen
+          name="create"
+          options={{ title: "Create Blog", headerTitleAlign: "center" }}
         />
       </Stack>
     </ThemeProvider>
