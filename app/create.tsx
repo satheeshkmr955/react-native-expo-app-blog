@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { TextInput, TouchableOpacity } from "react-native";
+import { Pressable, TextInput } from "react-native";
 import Animated from "react-native-reanimated";
-
-import { useBlogStore } from "@/store/use-blog-store";
 import { useRouter } from "expo-router";
+
+import { Post } from "@prisma/client";
+import { useBlogStore } from "@/store/use-blog-store";
+import { axiosFetcher } from "@/lib/fetcher";
 
 const CreateScreen = () => {
   const [title, setTitle] = useState("");
@@ -12,12 +14,22 @@ const CreateScreen = () => {
 
   const { addBlogPost, setCurrentBlogPost } = useBlogStore((state) => state);
 
-  const onAddHandler = () => {
-    const newPost = addBlogPost({ title, content });
+  const onAddHandler = async () => {
+    try {
+      const response = await axiosFetcher({
+        url: "/blogposts",
+        method: "POST",
+        data: { title, content },
+      });
+      const data: { post: Post } = await response.data;
+      const newPost = addBlogPost(data.post);
 
-    setCurrentBlogPost(newPost);
+      setCurrentBlogPost(newPost);
 
-    router.navigate("(home)");
+      router.navigate("(home)");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -38,11 +50,11 @@ const CreateScreen = () => {
         onChangeText={(text) => setContent(text)}
         placeholder="Enter some content"
       />
-      <TouchableOpacity onPress={onAddHandler}>
+      <Pressable onPress={onAddHandler}>
         <Animated.Text className="p-2 text-center font-semibold text-xl mt-4 rounded-md bg-blue-500 !text-white mb-4">
           Add Blog Post
         </Animated.Text>
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 };

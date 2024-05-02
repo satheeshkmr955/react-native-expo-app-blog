@@ -1,0 +1,23 @@
+version: "3.1"
+services:
+  twitch_db:
+    image: postgres
+    container_name: twitch_db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: twitch
+    volumes:
+      - twitch_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  twitch_adminer:
+    image: adminer
+    container_name: twitch_adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  twitch_data:

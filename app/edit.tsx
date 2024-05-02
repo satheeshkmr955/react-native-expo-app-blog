@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { TextInput, TouchableOpacity } from "react-native";
+import { Pressable, TextInput } from "react-native";
 import Animated from "react-native-reanimated";
-
-import { useBlogStore } from "@/store/use-blog-store";
 import { useRouter } from "expo-router";
+
+import { Post } from "@prisma/client";
+import { useBlogStore } from "@/store/use-blog-store";
+import { axiosFetcher } from "@/lib/fetcher";
 
 const EditScreen = () => {
   const {
@@ -20,12 +22,22 @@ const EditScreen = () => {
   const [content, setContent] = useState(post.content);
   const router = useRouter();
 
-  const onEditHandler = () => {
-    const newPost = editBlogPost(post.id, { title, content });
+  const onEditHandler = async () => {
+    try {
+      const response = await axiosFetcher({
+        url: `/blogpost/${post.id}`,
+        method: "PATCH",
+        data: { title, content },
+      });
+      const data: { post: Post } = await response.data;
+      const newPost = editBlogPost(post.id, data.post);
 
-    setCurrentBlogPost(newPost);
+      setCurrentBlogPost(newPost);
 
-    router.navigate("show");
+      router.navigate("show");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -44,11 +56,11 @@ const EditScreen = () => {
         onChangeText={(text) => setContent(text)}
         placeholder="Edit some content"
       />
-      <TouchableOpacity onPress={onEditHandler}>
+      <Pressable onPress={onEditHandler}>
         <Animated.Text className="p-2 text-center font-semibold text-xl mt-4 rounded-md bg-blue-500 !text-white mb-4">
           Save
         </Animated.Text>
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 };
